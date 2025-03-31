@@ -1,0 +1,148 @@
+<!DOCTYPE html><html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Disha!</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .message {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2em;
+        }
+        .image-container {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+        .image-container img {
+            width: 150px;
+            height: auto;
+            border-radius: 10px;
+        }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="message">Happy Birthday Disha! 🎉🎂</div>
+    <div class="image-container">
+        <img src="disha1.jpg" alt="Disha 1">
+        <img src="disha2.jpg" alt="Disha 2">
+    </div>
+<audio controls autoplay loop>
+    <source src="birthday_song.mp3" type="audio/mpeg">
+</audio>
+    <canvas id="stars"></canvas>
+    <canvas id="fireworks"></canvas><script>
+    const starsCanvas = document.getElementById('stars');
+    const fireworksCanvas = document.getElementById('fireworks');
+    const ctxStars = starsCanvas.getContext('2d');
+    const ctxFireworks = fireworksCanvas.getContext('2d');
+    starsCanvas.width = fireworksCanvas.width = window.innerWidth;
+    starsCanvas.height = fireworksCanvas.height = window.innerHeight;
+
+    let stars = [];
+    function createStars() {
+        for (let i = 0; i < 100; i++) {
+            stars.push({
+                x: Math.random() * starsCanvas.width,
+                y: Math.random() * starsCanvas.height,
+                brightness: Math.random()
+            });
+        }
+    }
+    function drawStars() {
+        ctxStars.clearRect(0, 0, starsCanvas.width, starsCanvas.height);
+        stars.forEach(star => {
+            ctxStars.fillStyle = `rgba(255, 255, 255, ${star.brightness})`;
+            ctxStars.fillRect(star.x, star.y, 2, 2);
+            star.brightness = Math.random();
+        });
+        requestAnimationFrame(drawStars);
+    }
+    createStars();
+    drawStars();
+
+    function createShootingStar() {
+        let x = Math.random() * starsCanvas.width;
+        let y = Math.random() * starsCanvas.height / 2;
+        let length = Math.random() * 100 + 50;
+        let speed = Math.random() * 4 + 2;
+        let angle = Math.PI / 4;
+        let sx = Math.cos(angle) * speed;
+        let sy = Math.sin(angle) * speed;
+        let opacity = 1;
+
+        function animate() {
+            ctxStars.clearRect(x, y, length, length);
+            ctxStars.strokeStyle = `rgba(255, 255, 255, ${opacity})`;
+            ctxStars.lineWidth = 2;
+            ctxStars.beginPath();
+            ctxStars.moveTo(x, y);
+            ctxStars.lineTo(x - sx * length, y - sy * length);
+            ctxStars.stroke();
+            x += sx;
+            y += sy;
+            opacity -= 0.02;
+            if (opacity > 0) requestAnimationFrame(animate);
+        }
+        animate();
+    }
+    setInterval(createShootingStar, 3000);
+
+    function createFirework(x, y) {
+        let particles = [];
+        for (let i = 0; i < 50; i++) {
+            let angle = (i / 50) * (2 * Math.PI);
+            particles.push({ x, y, angle, speed: Math.random() * 4 + 2, opacity: 1 });
+        }
+        function animate() {
+            ctxFireworks.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
+            particles.forEach(p => {
+                let dx = Math.cos(p.angle) * p.speed;
+                let dy = Math.sin(p.angle) * p.speed;
+                p.x += dx;
+                p.y += dy;
+                p.opacity -= 0.02;
+                ctxFireworks.fillStyle = `rgba(255, 100, 0, ${p.opacity})`;
+                ctxFireworks.beginPath();
+                ctxFireworks.arc(p.x, p.y, 3, 0, Math.PI * 2);
+                ctxFireworks.fill();
+            });
+            particles = particles.filter(p => p.opacity > 0);
+            if (particles.length > 0) requestAnimationFrame(animate);
+        }
+        animate();
+    }
+    document.addEventListener('click', e => createFirework(e.clientX, e.clientY));
+    document.addEventListener('touchstart', e => {
+        let touch = e.touches[0];
+        createFirework(touch.clientX, touch.clientY);
+    });
+
+  window.addEventListener('click', () => {
+      let audio = new Audio('birthday_song.mp3');
+      audio.play();
+  }, { once: true });
+
+</script>
+
+</body>
+</html>
